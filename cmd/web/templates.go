@@ -6,4 +6,6 @@ import "github.com/Concentration-point/SnippetBox/internal/models"
 // 任何动态数据的持有结构。
 type templateData struct {
 	Snippet *models.Snippet
+	//包含一个用于保存片段切片的Snippets字段
+	Snippets []*models.Snippet
 }

@@ -25,33 +25,33 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, snippet := range snippets {
-		fmt.Fprintf(w, "%+v\n", snippet)
+	files := []string{
+		"./ui/html/base.html",
+		"./ui/html/pages/home.html",
+		"./ui/html/partials/nav.html",
 	}
-
-	// files := []string{
-	// 	"./ui/html/base.html",
-	// 	"./ui/html/pages/home.html",
-	// 	"./ui/html/partials/nav.html",
-	// }
 
 	// // 将定义的多个模板文件解析为一个模板集合（*template.Template），以便后续渲染。
 	// /*template.ParseFiles(files...)：text/template 包（的函数，用于解析指定路径的模板文件。
 	//   files... 表示将切片元素展开作为参数传入。
 	// */
-	// ts, err := template.ParseFiles(files...)
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// 	return
-	// }
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 
-	// // err = ts.Execute(w, nil)
-	// // 将解析后的模板集合中的指定模板（这里是 base）渲染到响应中，返回给客户端。
-	// err = ts.ExecuteTemplate(w, "base", nil)
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// }
-	// w.Write([]byte("Hello from Snippetbox"))
+	data := &templateData{
+		Snippets: snippets,
+	}
+
+	// err = ts.Execute(w, nil)
+	// 将解析后的模板集合中的指定模板（这里是 base）渲染到响应中，返回给客户端。
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+	}
+
 }
 func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	// stringconvert 将字符串转为int
