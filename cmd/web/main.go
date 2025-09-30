@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -12,9 +13,10 @@ import (
 )
 
 type application struct {
-	errLog   *log.Logger
-	infoLog  *log.Logger
-	snippets *models.SnippetModel
+	errLog        *log.Logger
+	infoLog       *log.Logger
+	snippets      *models.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -38,10 +40,17 @@ func main() {
 
 	defer db.Close()
 
+	// 初始化新的模板缓存
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		errlog.Fatal(err)
+	}
+
 	app := &application{
-		errLog:   errlog,
-		infoLog:  InfoLog,
-		snippets: &models.SnippetModel{DB: db},
+		errLog:        errlog,
+		infoLog:       InfoLog,
+		snippets:      &models.SnippetModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	// Addr：赋值为*addr，确保服务器使用与之前相同的网络地址。

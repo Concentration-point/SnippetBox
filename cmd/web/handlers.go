@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 
@@ -25,32 +24,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.html",
-		"./ui/html/pages/home.html",
-		"./ui/html/partials/nav.html",
-	}
-
-	// // 将定义的多个模板文件解析为一个模板集合（*template.Template），以便后续渲染。
-	// /*template.ParseFiles(files...)：text/template 包（的函数，用于解析指定路径的模板文件。
-	//   files... 表示将切片元素展开作为参数传入。
-	// */
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{
+	app.render(w, http.StatusOK, "home.html", &templateData{
 		Snippets: snippets,
-	}
-
-	// err = ts.Execute(w, nil)
-	// 将解析后的模板集合中的指定模板（这里是 base）渲染到响应中，返回给客户端。
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	})
 
 }
 func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
@@ -70,32 +46,9 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 初始化一个包含view.tmpl文件路径的切片，
-	// 加上之前制作的基础布局和导航部分。
-	files := []string{
-		"./ui/html/base.html",
-		"./ui/html/partials/nav.html",
-		"./ui/html/pages/view.html",
-	}
-
-	// 解析模板文件...
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{
+	app.render(w, http.StatusOK, "view.html", &templateData{
 		Snippet: snippet,
-	}
-
-	// 执行模板时传入templateData结构体。
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
-	fmt.Fprintf(w, "%+v", snippet)
+	})
 }
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
