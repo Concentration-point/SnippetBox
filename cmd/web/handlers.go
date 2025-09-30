@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	// "html/template"
+	"html/template"
 	"net/http"
 	"strconv"
 
@@ -68,6 +68,31 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 			app.serverError(w, err)
 		}
 		return
+	}
+
+	// 初始化一个包含view.tmpl文件路径的切片，
+	// 加上之前制作的基础布局和导航部分。
+	files := []string{
+		"./ui/html/base.html",
+		"./ui/html/partials/nav.html",
+		"./ui/html/pages/view.html",
+	}
+
+	// 解析模板文件...
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	data := &templateData{
+		Snippet: snippet,
+	}
+
+	// 执行模板时传入templateData结构体。
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
 	}
 
 	fmt.Fprintf(w, "%+v", snippet)
