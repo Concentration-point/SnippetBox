@@ -2,7 +2,9 @@ package main
 
 import (
 	"html/template"
+	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/Concentration-point/SnippetBox/internal/models"
 )
@@ -10,7 +12,8 @@ import (
 // 定义一个templateData类型，作为我们想要传递给HTML模板的
 // 任何动态数据的持有结构。
 type templateData struct {
-	Snippet *models.Snippet
+	CurrentYear int
+	Snippet     *models.Snippet
 	//包含一个用于保存片段切片的Snippets字段
 	Snippets []*models.Snippet
 }
@@ -56,4 +59,12 @@ func newTemplateCache() (map[string]*template.Template, error) {
 
 	// 返回映射。
 	return cache, nil
+}
+
+// 创建一个newTemplateData()辅助函数，它返回一个指向templateData结构体的指针，
+// 该结构体用当前年份初始化。注意目前在这里没有使用*http.Request参数，
+func (app *application) newTemplateData(r *http.Request) *templateData {
+	return &templateData{
+		CurrentYear: time.Now().Year(),
+	}
 }
